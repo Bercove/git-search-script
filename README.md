@@ -122,7 +122,7 @@ alexj|https://gitlab.com/alexj|Alex Johnson|23|San Francisco|GitLab
 ./gitsearch.sh -t users "python developer"
 ```
 
-### User Information Includes:
+### User Information Includes
 
 - **Username**: Their platform handle  
 - **Profile URL**: Direct link to their profile  
