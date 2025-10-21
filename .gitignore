@@ -1,0 +1,20 @@
+# Config files
+.gitsearch_config
+*.config
+
+# Output files
+*.csv
+*.json
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
