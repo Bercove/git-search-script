@@ -113,7 +113,7 @@ owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 ./gitsearch.sh "machine learning python"
 
 # Search for a specific company's repos
-./gitsearch.sh "axway api management"
+./gitsearch.sh "itgrepnet api management"
 
 # Look for Docker-related projects
 ./gitsearch.sh -n 8 "docker compose"
@@ -150,21 +150,21 @@ owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 
 ### Common Issues
 
-**"Missing dependencies"**
+**Missing dependencies**
 
 ```bash
 # Install required tools
 sudo apt-get install curl jq
 ```
 
-**"API rate limit exceeded"**
+**API rate limit exceeded**
 
 ```bash
 # Set up tokens for higher limits
 ./gitsearch.sh --setup
 ```
 
-**"No results found"**
+**No results found**
 
 - Try different search terms  
 - Check your internet connection  
