@@ -1,12 +1,14 @@
 # Git Search 🔍
 
-A powerful bash script for searching repositories across GitHub and GitLab simultaneously.
+A powerful bash script for searching repositories and users across GitHub and GitLab simultaneously.
 
 ---
 
 ## ✨ Features
 
 - **Dual Platform Search**: Search both GitHub and GitLab in one command  
+- **Multiple Search Types**: Search repositories, users, or both  
+- **User Repository Discovery**: Find users and their public repositories  
 - **Smart Result Balancing**: Automatically balances results between platforms  
 - **API Token Support**: Higher rate limits with personal access tokens  
 - **Flexible Output**: Consistent, parseable output format  
@@ -32,7 +34,7 @@ brew install curl jq
 # Make script executable
 chmod +x gitsearch.sh
 
-# Basic search
+# Basic repository search
 ./gitsearch.sh "machine learning"
 
 # Search with platform filter
@@ -46,10 +48,17 @@ chmod +x gitsearch.sh
 
 ## 📖 Usage
 
-### Basic Search
+### Basic Search Types
 
 ```bash
+# Search repositories (default)
 ./gitsearch.sh "your search query"
+
+# Search for users only
+./gitsearch.sh -t users "john"
+
+# Search both repositories and users
+./gitsearch.sh -t both "react"
 ```
 
 ### Advanced Options
@@ -64,6 +73,12 @@ chmod +x gitsearch.sh
 # Get 20 results (10 from each platform)
 ./gitsearch.sh -n 20 "api platform"
 
+# User search on GitHub only
+./gitsearch.sh -t users -p github "developer"
+
+# Combined search with custom limits
+./gitsearch.sh -t both -n 15 "python"
+
 # Set up API tokens
 ./gitsearch.sh --setup
 
@@ -73,12 +88,48 @@ chmod +x gitsearch.sh
 
 ---
 
-## 🧾 Output Format
+## 🧾 Output Formats
+
+### Repository Output
 
 ```text
 repository_name|repository_url|description|stars|forks|language
 owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 ```
+
+### User Output
+
+```text
+username|profile_url|name|repos_count|location|platform
+johnsmith|https://github.com/johnsmith|John Smith|45|New York|GitHub
+alexj|https://gitlab.com/alexj|Alex Johnson|23|San Francisco|GitLab
+```
+
+---
+
+## 👥 User Search & Repository Discovery
+
+### Find Users and Their Repositories
+
+```bash
+# Search for users matching a name or username
+./gitsearch.sh -t users "bercove"
+
+# Find developers in a specific location
+./gitsearch.sh -t users "san francisco"
+
+# Discover users with many repositories
+./gitsearch.sh -t users "python developer"
+```
+
+### User Information Includes:
+
+- **Username**: Their platform handle  
+- **Profile URL**: Direct link to their profile  
+- **Full Name**: Real name (if public)  
+- **Repository Count**: Number of public repositories  
+- **Location**: Geographic location (if provided)  
+- **Platform**: GitHub or GitLab  
 
 ---
 
@@ -108,6 +159,8 @@ owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 
 ## 🎯 Examples
 
+### Repository Search Examples
+
 ```bash
 # Find machine learning repositories
 ./gitsearch.sh "machine learning python"
@@ -122,14 +175,52 @@ owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 ./gitsearch.sh -p gitlab "rust web framework"
 ```
 
+### User Search Examples
+
+```bash
+# Find users by name
+./gitsearch.sh -t users "alex"
+
+# Search for developers in a specific technology
+./gitsearch.sh -t users "react developer"
+
+# Find GitLab users only
+./gitsearch.sh -t users -p gitlab "devops"
+
+# Combined search for comprehensive results
+./gitsearch.sh -t both "data science"
+```
+
+### Advanced User Discovery
+
+```bash
+# Find prolific open-source contributors
+./gitsearch.sh -t users -n 20 "python"
+
+# Locate developers in specific regions
+./gitsearch.sh -t users "london engineer"
+
+# Discover users with specific skills
+./gitsearch.sh -t users "kubernetes"
+```
+
 ---
 
 ## 🔍 Search Tips
+
+### For Repository Search
 
 - Use specific keywords for better results  
 - Combine technologies: `"python machine learning tensorflow"`  
 - Search for companies: `"netflix open source"`  
 - Use platform-specific searches when looking for particular ecosystems  
+
+### For User Search
+
+- Search by username, full name, or location  
+- Combine skills and location: `"python developer new york"`  
+- Look for prolific contributors with high repository counts  
+- Use platform-specific searches to find experts in particular ecosystems  
 
 ---
 
@@ -139,6 +230,7 @@ owner/repo|https://github.com/owner/repo|Repo description|150|25|JavaScript
 |--------|--------------|----------|
 | `-p, --platform` | Platform: github, gitlab, or both | both |
 | `-n, --number` | Number of results | 10 |
+| `-t, --type` | Search type: repos, users, or both | repos |
 | `--github-token` | Set GitHub token | - |
 | `--gitlab-token` | Set GitLab token | - |
 | `--setup` | Interactive token setup | - |
@@ -169,6 +261,7 @@ sudo apt-get install curl jq
 - Try different search terms  
 - Check your internet connection  
 - Verify API tokens are valid  
+- For user search, try variations of names or usernames  
 
 **Debug Mode**
 
@@ -176,6 +269,46 @@ Add `set -x` at the top of the script for detailed debugging.
 
 ---
 
+## 💡 Use Cases
+
+### For Recruiters
+
+```bash
+# Find Python developers in Berlin
+./gitsearch.sh -t users "python berlin"
+
+# Discover React experts on GitHub
+./gitsearch.sh -t users -p github "react"
+```
+
+### For Open Source Contributors
+
+```bash
+# Find active maintainers in your technology stack
+./gitsearch.sh -t users "kubernetes maintainer"
+
+# Discover projects by prolific developers
+./gitsearch.sh -t both "machine learning"
+```
+
+### For Research
+
+```bash
+# Study developer distribution across platforms
+./gitsearch.sh -t users "rust"
+
+# Analyze repository patterns by location
+./gitsearch.sh -t both "san francisco"
+```
+
+---
+
 ## 📄 License
 
 MIT License — feel free to use and modify for your projects.
+
+---
+
+## 🔄 Version History
+
+See [`CHANGELOG.md`](CHANGELOG.md) for detailed version changes.
