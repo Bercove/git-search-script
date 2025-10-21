@@ -1,13 +1,9 @@
-
-## 🔧 Enhanced gitsearch.sh
-
-```bash
 #!/bin/bash
 
 # Git Search 🔍
 # A powerful tool for searching repositories across GitHub and GitLab
-# Version: 2.0.0
-# Author: Your Name
+# Version: 2.0.1
+# Author: Bercove
 # License: MIT
 
 set -e  # Exit on error
@@ -24,7 +20,7 @@ NC='\033[0m' # No Color
 CONFIG_FILE="$HOME/.gitsearch_config"
 GITHUB_API="https://api.github.com/search/repositories"
 GITLAB_API="https://gitlab.com/api/v4/projects"
-VERSION="2.0.0"
+VERSION="2.0.1"
 
 # Banner
 show_banner() {
