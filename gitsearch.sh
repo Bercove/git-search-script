@@ -2,7 +2,7 @@
 
 # Git Search 🔍
 # A powerful tool for searching repositories and users across GitHub and GitLab
-# Version: 2.1.0
+# Version: 2.1.1
 # Author: Bercove
 # License: MIT
 
@@ -21,7 +21,7 @@ NC='\033[0m'
 CONFIG_FILE="$HOME/.gitsearch_config"
 GITHUB_API="https://api.github.com"
 GITLAB_API="https://gitlab.com/api/v4"
-VERSION="2.1.0"
+VERSION="2.1.1"
 
 # Banner
 show_banner() {
@@ -59,6 +59,7 @@ OPTIONS:
     -p, --platform PLATFORM    Search platform: github, gitlab, both (default: both)
     -n, --number NUMBER        Number of results (default: 10)
     -t, --type TYPE            Search type: repos, users, both (default: repos)
+    -l, --language LANGUAGE    Filter by programming language (e.g., PHP, Python, JavaScript)
     --github-token TOKEN       Set GitHub personal access token
     --gitlab-token TOKEN       Set GitLab personal access token
     --setup                    Interactive setup for API tokens
@@ -70,9 +71,12 @@ EXAMPLES:
     $0 "machine learning"
     $0 -p github -n 5 "python web framework"
 
+    # Search with language filter
+    $0 -l PHP "cms"
+    $0 -l Python "machine learning" -n 15
+
     # Search users
     $0 -t users "john"
-    $0 -t users -p gitlab "alex"
 
     # Search both repositories and users
     $0 -t both "react"
@@ -142,15 +146,26 @@ make_api_request() {
 search_github_repos() {
     local query="$1"
     local max_results="$2"
+    local language="$3"
     
     if [[ -z "$query" ]]; then
         return
     fi
     
     local encoded_query=$(echo "$query" | sed 's/ /+/g' | sed 's/"/%22/g')
-    local url="$GITHUB_API/search/repositories?q=$encoded_query&per_page=$max_results&sort=bestmatch"
+    local url="$GITHUB_API/search/repositories?q=$encoded_query"
+    
+    # Add language filter if specified
+    if [[ -n "$language" ]]; then
+        url="${url}+language:${language}"
+    fi
+    
+    url="${url}&per_page=$max_results&sort=bestmatch"
     
     echo -e "  ${CYAN}🔍 GitHub Repos:${NC} $query" >&2
+    if [[ -n "$language" ]]; then
+        echo -e "  ${BLUE}   Language Filter:${NC} $language" >&2
+    fi
     
     local response
     response=$(make_api_request "$url" "github")
@@ -166,6 +181,7 @@ search_github_repos() {
 search_gitlab_repos() {
     local query="$1"
     local max_results="$2"
+    local language="$3"
     
     if [[ -z "$query" ]]; then
         return
@@ -175,6 +191,9 @@ search_gitlab_repos() {
     local url="$GITLAB_API/projects?search=$encoded_query&per_page=$max_results&order_by=similarity"
     
     echo -e "  ${CYAN}🔍 GitLab Repos:${NC} $query" >&2
+    if [[ -n "$language" ]]; then
+        echo -e "  ${BLUE}   Language Filter:${NC} $language" >&2
+    fi
     
     local response
     response=$(make_api_request "$url" "gitlab")
@@ -183,7 +202,15 @@ search_gitlab_repos() {
         return 1
     fi
     
-    echo "$response" | jq -r '.[]? | "\(.path_with_namespace)|\(.web_url)|\(.description // "No description")|\(.star_count)|\(.forks_count)|\(.language // "Unknown")"' 2>/dev/null
+    # For GitLab, we need to filter by language after getting results
+    local results=$(echo "$response" | jq -r '.[]? | "\(.path_with_namespace)|\(.web_url)|\(.description // "No description")|\(.star_count)|\(.forks_count)|\(.language // "Unknown")"' 2>/dev/null)
+    
+    # Filter by language if specified
+    if [[ -n "$language" ]]; then
+        echo "$results" | awk -F'|' -v lang="$language" 'tolower($6) == tolower(lang)'
+    else
+        echo "$results"
+    fi
 }
 
 # Search GitHub users
@@ -273,6 +300,7 @@ main_repo_search() {
     local query="$1"
     local platform="$2"
     local max_results="$3"
+    local language="$4"
     
     if [[ -z "$query" ]]; then
         echo -e "${RED}ERROR: Query is empty${NC}" >&2
@@ -292,11 +320,14 @@ main_repo_search() {
     
     echo -e "${BLUE}📦 Repository Search:${NC} $query"
     echo -e "${BLUE}🎯 Max Results:${NC} $max_results"
+    if [[ -n "$language" ]]; then
+        echo -e "${GREEN}🔤 Language Filter:${NC} $language"
+    fi
     echo
     
     if [[ "$platform" == "github" || "$platform" == "both" ]]; then
         local github_results
-        github_results=$(search_github_repos "$query" "$platform_max")
+        github_results=$(search_github_repos "$query" "$platform_max" "$language")
         if [[ $? -eq 0 && -n "$github_results" ]]; then
             results="${results}${github_results}\n"
             github_count=$(echo -e "$github_results" | grep -c .)
@@ -305,7 +336,7 @@ main_repo_search() {
     
     if [[ "$platform" == "gitlab" || "$platform" == "both" ]]; then
         local gitlab_results
-        gitlab_results=$(search_gitlab_repos "$query" "$platform_max")
+        gitlab_results=$(search_gitlab_repos "$query" "$platform_max" "$language")
         if [[ $? -eq 0 && -n "$gitlab_results" ]]; then
             results="${results}${gitlab_results}\n"
             gitlab_count=$(echo -e "$gitlab_results" | grep -c .)
@@ -405,6 +436,7 @@ main() {
     local platform="both"
     local max_results=10
     local search_type="repos"
+    local language=""
     local query=""
     
     while [[ $# -gt 0 ]]; do
@@ -419,6 +451,10 @@ main() {
                 ;;
             -t|--type)
                 search_type="$2"
+                shift 2
+                ;;
+            -l|--language)
+                language="$2"
                 shift 2
                 ;;
             --github-token)
@@ -462,7 +498,7 @@ main() {
     
     case "$search_type" in
         "repos")
-            main_repo_search "$query" "$platform" "$max_results"
+            main_repo_search "$query" "$platform" "$max_results" "$language"
             ;;
         "users")
             main_user_search "$query" "$platform" "$max_results"
@@ -470,9 +506,12 @@ main() {
         "both")
             echo -e "${BLUE}🔍 Combined Search:${NC} $query"
             echo -e "${BLUE}🎯 Max Results:${NC} $max_results (each type)"
+            if [[ -n "$language" ]]; then
+                echo -e "${GREEN}🔤 Language Filter:${NC} $language (applies to repositories only)"
+            fi
             echo
             echo -e "${CYAN}=== REPOSITORIES ===${NC}"
-            main_repo_search "$query" "$platform" "$max_results"
+            main_repo_search "$query" "$platform" "$max_results" "$language"
             echo
             echo -e "${PURPLE}=== USERS ===${NC}"
             main_user_search "$query" "$platform" "$max_results"

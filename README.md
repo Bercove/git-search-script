@@ -8,6 +8,7 @@ A powerful bash script for searching repositories and users across GitHub and Gi
 
 - **Dual Platform Search**: Search both GitHub and GitLab in one command  
 - **Multiple Search Types**: Search repositories, users, or both  
+- **Language Filter Support**: Search repositories by programming language using `-l` or `--language`  
 - **User Repository Discovery**: Find users and their public repositories  
 - **Smart Result Balancing**: Automatically balances results between platforms  
 - **API Token Support**: Higher rate limits with personal access tokens  
@@ -157,6 +158,23 @@ alexj|https://gitlab.com/alexj|Alex Johnson|23|San Francisco|GitLab
 
 ---
 
+## 🚀 Usage Examples (with Language Filter)
+
+You can now filter repositories by programming language:
+
+```bash
+# Search for PHP repositories
+./gitsearch.sh -l PHP "cms"
+
+# Search for Python machine learning repositories
+./gitsearch.sh -l Python "machine learning" -n 15
+
+# Search for JavaScript repositories on GitHub only
+./gitsearch.sh -l JavaScript -p github "web framework"
+```
+
+---
+
 ## 🎯 Examples
 
 ### Repository Search Examples
@@ -212,6 +230,7 @@ alexj|https://gitlab.com/alexj|Alex Johnson|23|San Francisco|GitLab
 
 - Use specific keywords for better results  
 - Combine technologies: `"python machine learning tensorflow"`  
+- Filter by language: `./gitsearch.sh -l JavaScript "framework"`  
 - Search for companies: `"netflix open source"`  
 - Use platform-specific searches when looking for particular ecosystems  
 
@@ -231,6 +250,7 @@ alexj|https://gitlab.com/alexj|Alex Johnson|23|San Francisco|GitLab
 | `-p, --platform` | Platform: github, gitlab, or both | both |
 | `-n, --number` | Number of results | 10 |
 | `-t, --type` | Search type: repos, users, or both | repos |
+| `-l, --language` | Filter repositories by programming language | none |
 | `--github-token` | Set GitHub token | - |
 | `--gitlab-token` | Set GitLab token | - |
 | `--setup` | Interactive token setup | - |
